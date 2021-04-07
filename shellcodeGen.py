@@ -42,7 +42,7 @@ def main():
 
     re_byte = re.compile(r'\s([0-9a-f]{2}\s){1,7}')
     re_spaceStrip = re.compile(r'\s[^\S\r\n]')
-    re_rawByte = re.compile(r'(?:\\t|\s)')
+    re_rawByte = re.compile(r'(?:\s|\t)')
     shellcode = ''
 
     # Iterate through file line by line, grab needed bytes,
