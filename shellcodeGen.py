@@ -29,8 +29,8 @@ def PromptUser(re_exe) -> str:
 
 '''
 ########################################################################################################################
-Name:       PromptUser
-Purpose:    Prompt the user for input, handle errors accordingly.
+Name:       PrintErr
+Purpose:    Prints a timed error message.
 Parameters: The error message to be displayed and the time interval it should be displayed in seconds.
 Returns:    None
 ########################################################################################################################
@@ -71,34 +71,50 @@ def main():
 
     # Shell escape filename for execution #
     file = shlex.quote(filename)
+    # Set temp file name for pre-parsing #
+    tmp_file = f'/tmp/{filename}.txt'
 
-    # Run objdump utility with on selected object file, write result to file #
-    with open('/tmp/' + filename + '.txt', 'a') as out_file:
+    # Open the file in temporary write mode #
+    with open(tmp_file, 'w') as out_file:
+        # Create objdump command process, storing output in open file #
+        command = subprocess.Popen(['objdump', '-M', 'intel', '-D', file], stdout=out_file,
+                                   stderr=out_file, shell=False)
         try:
-            command = subprocess.Popen(['objdump', '-M', 'intel', '-D', file], stdout=out_file,
-                                       stderr=out_file, shell=False)
             command.communicate()
         except (subprocess.CompletedProcess, subprocess.TimeoutExpired, OSError, ValueError):
             command.kill()
             command.communicate()
 
+    # Compile regular expression for byte formatting #
     re_byte = re.compile(r'\s([0-9a-f]{2}\s){1,7}')
     re_space_strip = re.compile(r'\s[^\S\r\n]')
     re_raw_byte = re.compile(r'(?:\s|\t)')
     shellcode = ''
 
-    # Iterate through file line by line, grab needed bytes,
-    # and  format bytes to raw \xXX format # 
-    with open('/tmp/' + filename + '.txt', 'r') as re_file:
-        for line in re_file:
-            byte_grab = re.search(re_byte, line)
-            if byte_grab:
-                strip = re.sub(re_space_strip, r'', byte_grab.group(0))
-                raw_byte = re.sub(re_raw_byte, r'\\x', strip)
-                shellcode += raw_byte[:-2]
+    # If the file exists and has read access #
+    if os.path.isfile(tmp_file) and os.access(tmp_file, os.R_OK):
+        try:
+            # Open the temporary file in read mode #
+            with open(f'/tmp/{filename}.txt', 'r') as re_file:
+                # Iterate through file line by line #
+                for line in re_file:
+                    # Attempt to match bytes in line #
+                    byte_grab = re.search(re_byte, line)
+                    # If regex matches #
+                    if byte_grab:
+                        # Strip whitespace from match #
+                        strip = re.sub(re_space_strip, r'', byte_grab.group(0))
+                        # Format raw byte like \xXX #
+                        raw_byte = re.sub(re_raw_byte, r'\\x', strip)
+                        # Append raw byte to shellcode string #
+                        shellcode += raw_byte[:-2]
 
-    print('Shellcode: {}'.format(shellcode))
-    os.remove('/tmp/' + filename + '.txt')
+            print('Shellcode: {}'.format(shellcode))
+            # Unlink the temporary parsing file #
+            os.remove('/tmp/' + filename + '.txt')
+
+        except (IOError, OSError) as err:
+            PrintErr(err, 2)
 
 
 if __name__ == '__main__':
