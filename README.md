@@ -16,6 +16,6 @@ Ideally this program can be added to environment executables/path as a handy ter
 Example: python3 shellcodeGen.py ExecutableName
 - If arg is not passed, the user is prompted for input
 - Selected executable is run in objdump, the output in intel syntax is redirected to a temporary text file
-- The text file is then iterated over line by line; grabbing bytes, stripping whitespace, & formating it as shellcode
-- The shellcode formated for the current line will be appended to a variable
+- The text file is then iterated over line by line; grabbing bytes, stripping whitespace, & formatting it as shellcode
+- The shellcode formatted for the current line will be appended to a variable
 - Once all iterations are complete the temp file is deleted and final shellcode is provided
