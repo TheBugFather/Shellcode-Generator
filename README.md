@@ -6,7 +6,10 @@ This program was designed for Python3 on Linux systems with objdump utility.
 The modules use should be included in the Python3 default installation.
 
 ## Installation
-python3 & objdump are directly installed with Linux apt package manager.
+- python3 & objdump are directly installed with Linux apt package manager if not already installed.
+- Run setup.py <env name> to build virtual environment.
+- Once virtual env is built traverse to the Scripts directory in the environment folder just created.
+- In the Scripts directory, execute the "activate" script to activate the virtual environment.
 
 ## Purpose
 The purpose is to run objdump on selected file, grab bytes, & format as shellcode.
