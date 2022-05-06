@@ -3,7 +3,7 @@
 
 ## Prereqs
 This program was designed for Python3 on Linux systems with objdump utility.
-The modules use should be included in the Python3 default installation.
+The modules used should already be included in the Python3 default installation.
 
 ## Installation
 - Run the setup.py script to build a virtual environment and install all external packages in the created venv.
@@ -24,4 +24,4 @@ Example: python3 shellcodeGen.py ExecutableName
 - Selected executable is run in objdump, the output in intel syntax is redirected to a temporary text file
 - The text file is then iterated over line by line; grabbing bytes, stripping whitespace, & formatting it as shellcode
 - The shellcode formatted for the current line will be appended to a variable
-- Once all iterations are complete the temp file is deleted and final shellcode is provided
+- Once all iterations are complete the temp file is deleted and final shellcode result is provided

@@ -4,7 +4,7 @@ import re
 import shlex
 import subprocess
 import sys
-from time import sleep
+from time
 
 
 '''
@@ -21,7 +21,7 @@ def PromptUser(re_exe) -> str:
         prompt = input('invalid or no args provided .. enter file to grab bytes\n')
         if not re.search(re_exe, prompt):
             print('\n* Improper input .. try again *')
-            sleep(2)
+            time.sleep(2)
             continue
 
         return prompt
@@ -37,7 +37,7 @@ Returns:    None
 '''
 def PrintErr(msg: str, seconds: int):
     print(f'\n* [ERROR]: {msg} *\n', file=sys.stderr)
-    sleep(seconds)
+    time.sleep(seconds)
 
 
 '''
@@ -109,9 +109,9 @@ def main():
                         # Append raw byte to shellcode string #
                         shellcode += raw_byte[:-2]
 
-            print('Shellcode: {}'.format(shellcode))
+            print(f'Shellcode: {shellcode}')
             # Unlink the temporary parsing file #
-            os.remove('/tmp/' + filename + '.txt')
+            os.remove(f'/tmp/{filename}.txt')
 
         except (IOError, OSError) as err:
             PrintErr(err, 2)
