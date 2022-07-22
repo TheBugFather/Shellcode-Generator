@@ -4,7 +4,8 @@ import re
 import shlex
 import subprocess
 import sys
-from time
+import time
+from subprocess import CompletedProcess, Popen, TimeoutExpired
 
 
 '''
@@ -17,10 +18,14 @@ Returns:    Validated user input.
 '''
 def PromptUser(re_exe) -> str:
     while True:
-        os.system(shlex.quote('clear'))
+        # Clear the display #
+        os.system('clear')
+        # Prompt user for input #
         prompt = input('invalid or no args provided .. enter file to grab bytes\n')
+
+        # If input validation regex fails #
         if not re.search(re_exe, prompt):
-            print('\n* Improper input .. try again *')
+            PrintErr('Improper input .. try again', 2)
             time.sleep(2)
             continue
 
@@ -50,7 +55,7 @@ Returns:    None
 '''
 def main():
     # Compile path regex #
-    re_exe = re.compile(r'[a-zA-Z0-9_\"\' .,\-]{1,20}')
+    re_exe = re.compile(r'[a-zA-Z\d_\"\' .,\-]{1,20}')
 
     # If an arg was passed in #
     if len(sys.argv) > 1:
@@ -59,43 +64,55 @@ def main():
 
         # If regex did not match #
         if not arg_check:
+            # Prompt the user for input #
             filename = PromptUser(re_exe)
         else:
+            # Set the passed in arg as filename #
             filename = sys.argv[1]
     # If no args were passed in #
     elif len(sys.argv) == 1:
+        # Prompt the user for binary tp execute on #
         filename = PromptUser(re_exe)
+    # If unexpected error occurs parsing args #
     else:
+        PrintErr('Unknown error occurred on program startup', 2)
         # Exit program on error #
         sys.exit(1)
 
+    out_path = '/tmp/'
+    # Set temp file name for pre-parsing #
+    tmp_file = f'{out_path}{filename}.txt'
     # Shell escape filename for execution #
     file = shlex.quote(filename)
-    # Set temp file name for pre-parsing #
-    tmp_file = f'/tmp/{filename}.txt'
 
-    # Open the file in temporary write mode #
-    with open(tmp_file, 'w') as out_file:
-        # Create objdump command process, storing output in open file #
-        command = subprocess.Popen(['objdump', '-M', 'intel', '-D', file], stdout=out_file,
-                                   stderr=out_file, shell=False)
-        try:
-            command.communicate()
-        except (subprocess.CompletedProcess, subprocess.TimeoutExpired, OSError, ValueError):
-            command.kill()
-            command.communicate()
+    try:
+        # Open the temp file in write mode #
+        with open(tmp_file, 'w') as out_file:
+            # Create objdump command process, storing output in open file #
+            command = Popen(['objdump', '-M', 'intel', '-D', file], stdout=out_file, stderr=out_file)
+            try:
+                command.communicate()
+
+            # When process completes or is timed out #
+            except (CompletedProcess, TimeoutExpired, ValueError):
+                command.kill()
+                command.communicate()
+
+    # If error occurs during file operation #
+    except (IOError, OSError) as io_err:
+        PrintErr(f'Error occurred writing {file} objdump to {tmp_file}: {io_err}', 2)
 
     # Compile regular expression for byte formatting #
-    re_byte = re.compile(r'\s([0-9a-f]{2}\s){1,7}')
+    re_byte = re.compile(r'\s([a-f\d]{2}\s){1,7}')
     re_space_strip = re.compile(r'\s[^\S\r\n]')
     re_raw_byte = re.compile(r'(?:\s|\t)')
     shellcode = ''
 
-    # If the file exists and has read access #
+    # If the objdump output file exists and has read access #
     if os.path.isfile(tmp_file) and os.access(tmp_file, os.R_OK):
         try:
             # Open the temporary file in read mode #
-            with open(f'/tmp/{filename}.txt', 'r') as re_file:
+            with open(tmp_file, 'r') as re_file:
                 # Iterate through file line by line #
                 for line in re_file:
                     # Attempt to match bytes in line #
@@ -111,10 +128,10 @@ def main():
 
             print(f'Shellcode: {shellcode}')
             # Unlink the temporary parsing file #
-            os.remove(f'/tmp/{filename}.txt')
+            os.remove(f'{out_path}{filename}.txt')
 
-        except (IOError, OSError) as err:
-            PrintErr(err, 2)
+        except (IOError, OSError) as io_err:
+            PrintErr(f'Error occurred writing shellcode to {out_path}{filename}: {io_err}', 2)
 
 
 if __name__ == '__main__':
