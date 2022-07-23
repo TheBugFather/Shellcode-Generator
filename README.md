@@ -19,7 +19,8 @@ Ideally this program can be added to environment executables/path as a handy ter
 - In the bin directory, run the command `source activate` to activate the virtual environment.
 
 ## How it works
->Example: python3 shellcodeGen.py &lt;executable_name&gt;
+> Example:
+> python3 shellcodeGen.py &lt;executable\_name&gt;
 - If arg is not passed, the user is prompted for input
 - Selected executable is run in objdump, the output in intel syntax is redirected to a temporary text file
 - The text file is then iterated over line by line; grabbing bytes, stripping whitespace, & formatting it as shellcode
