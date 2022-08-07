@@ -22,7 +22,7 @@ The purpose is to run objdump on selected file, grab output bytes, & format as s
 - For Linux in the bin directory, run the command `source activate` to activate the virtual environment.
 
 ## How it works
-> Example: `python3 shellcodeGen.py &lt;executable&gt;`
+> Example: `python3 shellcodeGen.py <executable>`
 
 - If arg is not passed, the user is prompted for input
 - Selected executable is run in objdump, the output in intel syntax is redirected to a temporary text file
@@ -41,7 +41,7 @@ The purpose is to run objdump on selected file, grab output bytes, & format as s
 > main &nbsp;-&nbsp; Take input file, run in objdump, and parse output into shellcode.
 
 ## Exit Codes
-> 0 - Successful operation
-> 1 - Error occurred during parsing of args in startup
-> 2 - Error occurred writing objdump output to file
+> 0 - Successful operation<br>
+> 1 - Error occurred during parsing of args in startup<br>
+> 2 - Error occurred writing objdump output to file<br>
 > 3 - Error occurred reading objdump output for parsing shellcode
