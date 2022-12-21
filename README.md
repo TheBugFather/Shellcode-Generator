@@ -6,8 +6,8 @@
 &#9745;&#65039; Pylint verified 10/10
 
 ## Prereqs
-This program was designed for Python3 on Linux systems with objdump utility.
-The modules used should already be included in the Python3 default installation.
+This program is updated to Python version 3.10.6 on Linux systems with objdump utility.
+The modules used should already be included in the Python default installation.
 
 ## Purpose
 The purpose is to run objdump on selected file, grab output bytes, & format as shellcode.
@@ -15,11 +15,15 @@ The purpose is to run objdump on selected file, grab output bytes, & format as s
 ## Installation
 - Run the setup.py script to build a virtual environment and install all external packages in the created venv.
 
-> Example: `python3 setup.py venv`
+> Examples:<br> 
+>       &emsp;&emsp;- Windows:  `python setup.py venv`<br>
+>       &emsp;&emsp;- Linux:  `python3 setup.py venv`
 
 - Once virtual env is built traverse to the (Scripts-Windows or bin-Linux) directory in the environment folder just created.
-- For Windows in the Scripts directory, for execute the `./activate` script to activate the virtual environment.
-- For Linux in the bin directory, run the command `source activate` to activate the virtual environment.
+- For Windows, in the venv\Scripts directory, execute `activate` or `activate.bat` script to activate the virtual environment.
+- For Linux, in the venv/bin directory, execute `source activate` to activate the virtual environment.
+- If for some reason issues are experienced with the setup script, the alternative is to manually create an environment, activate it, then run pip install -r packages.txt in project root.
+- To exit from the virtual environment when finished, execute `deactivate`.
 
 ## How it works
 > Example: `python3 shellcodeGen.py <executable>`

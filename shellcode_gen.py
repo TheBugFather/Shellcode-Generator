@@ -3,11 +3,11 @@ import os
 import re
 import shlex
 import sys
-import time
+from pathlib import Path
 from subprocess import Popen, TimeoutExpired
 
 
-def objdump_run(filename: str, tmp_file: str):
+def objdump_run(filename: str, tmp_file: Path):
     """
     Takes the passed in binary executable, runs objdump utility, and writes the output to file.
 
@@ -20,7 +20,7 @@ def objdump_run(filename: str, tmp_file: str):
 
     try:
         # Open the temp file in write mode #
-        with open(tmp_file, 'w', encoding='utf-8') as out_file:
+        with tmp_file.open('w', encoding='utf-8') as out_file:
             # Create objdump command process, storing output in open file #
             with Popen(['objdump', '-M', 'intel', '-D', file], stdout=out_file,
                        stderr=out_file) as command:
@@ -34,20 +34,18 @@ def objdump_run(filename: str, tmp_file: str):
 
     # If error occurs during file operation #
     except (IOError, OSError) as io_err:
-        print_err(f'Error occurred writing {file} objdump to {tmp_file}: {io_err}', 2)
+        print_err(f'Error occurred writing {file} objdump to {str(tmp_file.resolve())}: {io_err}')
         sys.exit(2)
 
 
-def print_err(msg: str, seconds: int):
+def print_err(msg: str):
     """
     Prints a timed error message via stderr.
 
     :param msg:  The error message to be displayed.
-    :param seconds:   The time interval that the error message will be displayed.
     :return:  Nothing
     """
     print(f'\n* [ERROR]: {msg} *\n', file=sys.stderr)
-    time.sleep(seconds)
 
 
 def prompt_user(re_exe) -> str:
@@ -57,16 +55,17 @@ def prompt_user(re_exe) -> str:
     :param re_exe:  The regular expression match format.
     :return:  Validated user input.
     """
+    cmd = shlex.quote('clear')
+
     while True:
         # Clear the display #
-        os.system('clear')
+        os.system(cmd)
         # Prompt user for input #
-        prompt = input('invalid or no args provided .. enter file to grab bytes\n')
+        prompt = input('[+] Invalid or no args provided .. enter file to grab bytes: ')
 
         # If input validation regex fails #
         if not re.search(re_exe, prompt):
-            print_err('Improper input .. try again', 2)
-            time.sleep(2)
+            print_err('Improper input .. try again')
             continue
 
         return prompt
@@ -99,13 +98,13 @@ def main():
         filename = prompt_user(re_exe)
     # If unexpected error occurs parsing args #
     else:
-        print_err('Unknown error occurred on program startup', 2)
+        print_err('Unknown error occurred on program startup')
         # Exit program on error #
         sys.exit(1)
 
-    out_path = '/tmp/'
+    out_path = Path('/tmp')
     # Set temp file name for pre-parsing #
-    tmp_file = f'{out_path}{filename}.txt'
+    tmp_file = out_path / f'{filename}.txt'
 
     # Run objdump utility on binary file and save to tmp file #
     objdump_run(filename, tmp_file)
@@ -118,7 +117,7 @@ def main():
 
     try:
         # Open the temporary file in read mode #
-        with open(tmp_file, 'r', encoding='utf-8') as re_file:
+        with tmp_file.open('r', encoding='utf-8') as re_file:
             # Iterate through file line by line #
             for line in re_file:
                 # Attempt to match bytes in line #
@@ -133,13 +132,14 @@ def main():
                     shellcode += raw_byte[:-2]
 
         print(f'Shellcode: {shellcode}')
-        # Unlink the temporary parsing file #
-        os.remove(f'{out_path}{filename}.txt')
 
     # If error occurs during file operation #
     except (IOError, OSError) as io_err:
-        print_err(f'Error occurred writing shellcode to {out_path}{filename}: {io_err}', 2)
+        print_err(f'Error occurred writing shellcode to {str(tmp_file.resolve())}: {io_err}')
         sys.exit(3)
+
+    # Unlink the temporary parsing file #
+    tmp_file.unlink()
 
     sys.exit(0)
 
