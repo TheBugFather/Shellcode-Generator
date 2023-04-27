@@ -1,16 +1,23 @@
-## Shellcode Generator
-![alt text](https://github.com/ngimb64/Shellcode-Generator/blob/main/ShellcodeGen.png?raw=true)
+<div align="center" style="font-family: monospace">
+<h1>Shellcode-Generator</h1>
+&#9745;&#65039; Bandit verified &nbsp;|&nbsp; &#9745;&#65039; Synk verified &nbsp;|&nbsp; &#9745;&#65039; Pylint verified 10/10
+<br><br>
 
-&#9745;&#65039; Bandit verified<br>
-&#9745;&#65039; Synk verified<br>
-&#9745;&#65039; Pylint verified 10/10
+![alt text](https://github.com/ngimb64/Shellcode-Generator/blob/main/ShellcodeGen.png?raw=true)
+</div>
+
+## Purpose
+The purpose is to run objdump on selected file, grab output bytes, & format as shellcode.
+
+### License
+The program is licensed under [GNU Public License v3.0](LICENSE.md)
+
+### Contributions or Issues
+[CONTRIBUTING](CONTRIBUTING.md)
 
 ## Prereqs
 This program is updated to Python version 3.10.6 on Linux systems with objdump utility.
 The modules used should already be included in the Python default installation.
-
-## Purpose
-The purpose is to run objdump on selected file, grab output bytes, & format as shellcode.
 
 ## Installation
 - Run the setup.py script to build a virtual environment and install all external packages in the created venv.
