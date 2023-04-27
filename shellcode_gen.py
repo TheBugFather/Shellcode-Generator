@@ -33,8 +33,8 @@ def objdump_run(filename: str, tmp_file: Path):
                     command.communicate()
 
     # If error occurs during file operation #
-    except (IOError, OSError) as io_err:
-        print_err(f'Error occurred writing {file} objdump to {str(tmp_file.resolve())}: {io_err}')
+    except OSError as io_err:
+        print_err(f'Error occurred writing {file} objdump to {tmp_file}: {io_err}')
         sys.exit(2)
 
 
@@ -112,7 +112,7 @@ def main():
     # Compile regular expression for byte formatting #
     re_byte = re.compile(r'\s([a-f\d]{2}\s){1,7}')
     re_space_strip = re.compile(r'\s[^\S\r\n]')
-    re_raw_byte = re.compile(r'(?:\s|\t)')
+    re_raw_byte = re.compile(r'\s|\t')
     shellcode = ''
 
     try:
@@ -134,8 +134,8 @@ def main():
         print(f'Shellcode: {shellcode}')
 
     # If error occurs during file operation #
-    except (IOError, OSError) as io_err:
-        print_err(f'Error occurred writing shellcode to {str(tmp_file.resolve())}: {io_err}')
+    except OSError as io_err:
+        print_err(f'Error occurred writing shellcode to {tmp_file.name}: {io_err}')
         sys.exit(3)
 
     # Unlink the temporary parsing file #
