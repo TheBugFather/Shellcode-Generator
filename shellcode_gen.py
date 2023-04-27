@@ -24,13 +24,7 @@ def objdump_run(filename: str, tmp_file: Path):
             # Create objdump command process, storing output in open file #
             with Popen(['objdump', '-M', 'intel', '-D', file], stdout=out_file,
                        stderr=out_file) as command:
-                try:
-                    command.communicate()
-
-                # When process completes or is timed out #
-                except (TimeoutExpired, ValueError):
-                    command.kill()
-                    command.communicate()
+                command.communicate()
 
     # If error occurs during file operation #
     except OSError as io_err:
